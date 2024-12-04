@@ -17,13 +17,18 @@ public final class Constants {
   }
 
   public static class ArmProfile {
-    /* Id's and Port Assingments */
+    /* Id's and Port Assignments */
     public static final int shooterID_A = 18;
     public static final int shooterID_B = 19;
+    public static final int indexerID = 17;
 
     /* Set Outputs */
     public static final double kShooterDefaultOutput = 0.90;
     public static final double kShooterAmpOutput = 0.40;
+    public static final double kIndexerDefaultOutput = 1;
+
+    /* Sensor references */
+    public static final double noteStowedThreshold = 50;
 
   }
 

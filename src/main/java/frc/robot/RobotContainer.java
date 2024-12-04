@@ -15,8 +15,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.SpinShooter;
+import frc.robot.commands.StowNote;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 
 public class RobotContainer {
@@ -37,6 +39,7 @@ public class RobotContainer {
 
     /* Other subsustems */
     private final Shooter shooter = new Shooter();
+    private final Indexer indexer = new Indexer();
 
     /* Arm commands */
     // its good practice to only create the commands once. this makes java's memory management more happy
@@ -44,6 +47,7 @@ public class RobotContainer {
     // this is allows the command scheduler to manage priority
     SpinShooter setShooterSpeedforSepaker = new SpinShooter(shooter, Constants.ArmProfile.kShooterDefaultOutput);
     SpinShooter setShooterSpeedforAmp = new SpinShooter(shooter, Constants.ArmProfile.kShooterAmpOutput);
+    StowNote stowNote = new StowNote(indexer, Constants.ArmProfile.kIndexerDefaultOutput);
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -71,6 +75,7 @@ public class RobotContainer {
 
     joystick.y().whileTrue(setShooterSpeedforSepaker);
     joystick.x().whileTrue(setShooterSpeedforAmp);
+    joystick.b().onTrue(stowNote);
 
     drivetrain.registerTelemetry(logger::telemeterize);
     
