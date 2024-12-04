@@ -7,13 +7,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Indexer;
 
-public class StowNote extends Command {
+public class SetIndexerSpeed extends Command {
     // first, declare the things that will exist for this command
     private Indexer indexerSubsystem;
     private double outputValue;
-
-    /** Creates a new StowNote. */
-    public StowNote(Indexer indexerSubsystem, double outputValue) {
+    
+    /** Creates a new SetIndexerSpeed. */
+    public SetIndexerSpeed(Indexer indexerSubsystem, double outputValue) {
         this.indexerSubsystem = indexerSubsystem;
         this.outputValue = outputValue;
 
@@ -42,7 +42,7 @@ public class StowNote extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        // end this command when the indexer subsystem indicates the note is stowed
-        return indexerSubsystem.noteStowed();
-    }
+        // this command does not end by default
+        return false;
+    }           
 }

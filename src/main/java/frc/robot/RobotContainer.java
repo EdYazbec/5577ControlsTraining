@@ -13,8 +13,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.SetIndexerSpeed;
 import frc.robot.commands.SpinShooter;
+import frc.robot.commands.SpinShooterAndIndexer;
+import frc.robot.commands.StowAndShootNote;
 import frc.robot.commands.StowNote;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -48,6 +53,9 @@ public class RobotContainer {
     SpinShooter setShooterSpeedforSepaker = new SpinShooter(shooter, Constants.ArmProfile.kShooterDefaultOutput);
     SpinShooter setShooterSpeedforAmp = new SpinShooter(shooter, Constants.ArmProfile.kShooterAmpOutput);
     StowNote stowNote = new StowNote(indexer, Constants.ArmProfile.kIndexerDefaultOutput);
+    SetIndexerSpeed indexerTransferIndexerSpeed = new SetIndexerSpeed(indexer, Constants.ArmProfile.kIndexerDefaultOutput);
+    SpinShooterAndIndexer shootInSpeaker = new SpinShooterAndIndexer(setShooterSpeedforSepaker, indexerTransferIndexerSpeed);
+    StowAndShootNote stowAndShootNote = new StowAndShootNote(stowNote, shootInSpeaker);
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -75,7 +83,7 @@ public class RobotContainer {
 
     joystick.y().whileTrue(setShooterSpeedforSepaker);
     joystick.x().whileTrue(setShooterSpeedforAmp);
-    joystick.b().onTrue(stowNote);
+    joystick.b().whileTrue(stowAndShootNote);
 
     drivetrain.registerTelemetry(logger::telemeterize);
     
