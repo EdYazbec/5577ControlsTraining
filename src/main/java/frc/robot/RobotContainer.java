@@ -4,24 +4,28 @@
 
 package frc.robot;
 
+import java.security.spec.ECFieldF2m;
+
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 
+import edu.wpi.first.math.controller.proto.ArmFeedforwardProto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.MoveArmToPose;
 import frc.robot.commands.SetIndexerSpeed;
 import frc.robot.commands.SpinShooter;
-import frc.robot.commands.SpinShooterAndIndexer;
-import frc.robot.commands.StowAndShootNote;
 import frc.robot.commands.StowNote;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
@@ -31,7 +35,7 @@ public class RobotContainer {
     private double MaxAngularRate = 0.5 * Math.PI;               // 1/2 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
-    private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
+    public final CommandXboxController joystick = new CommandXboxController(0); // My joystick
     private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain;     // My drivetrain
 
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric() // I want field-centric
@@ -42,20 +46,28 @@ public class RobotContainer {
     //private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     //private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    /* Other subsustems */
+    /* Other subsystems */
     private final Shooter shooter = new Shooter();
     private final Indexer indexer = new Indexer();
+    public final Arm arm = new Arm();
 
-    /* Arm commands */
+    /* Commands */
     // its good practice to only create the commands once. this makes java's memory management more happy
     // were using the same command to set the shooter speed, but just passing different values to it
     // this is allows the command scheduler to manage priority
-    SpinShooter setShooterSpeedforSepaker = new SpinShooter(shooter, Constants.ArmProfile.kShooterDefaultOutput);
-    SpinShooter setShooterSpeedforAmp = new SpinShooter(shooter, Constants.ArmProfile.kShooterAmpOutput);
+    
+    /* Shooter commands */
+    SpinShooter setShooterSpeedForSpeaker = new SpinShooter(shooter, Constants.ArmProfile.kShooterDefaultOutput);
+    SpinShooter setShooterSpeedForAmp = new SpinShooter(shooter, Constants.ArmProfile.kShooterAmpOutput);
+
+    /* Indexer Commands */
     StowNote stowNote = new StowNote(indexer, Constants.ArmProfile.kIndexerDefaultOutput);
     SetIndexerSpeed indexerTransferIndexerSpeed = new SetIndexerSpeed(indexer, Constants.ArmProfile.kIndexerDefaultOutput);
-    SpinShooterAndIndexer shootInSpeaker = new SpinShooterAndIndexer(setShooterSpeedforSepaker, indexerTransferIndexerSpeed);
-    StowAndShootNote stowAndShootNote = new StowAndShootNote(stowNote, shootInSpeaker);
+
+    /* Arm Commands */
+    MoveArmToPose armToSpeaker = new MoveArmToPose(arm, Constants.ArmProfile.kArmSpeakerPos);
+    MoveArmToPose armToAmp = new MoveArmToPose(arm, Constants.ArmProfile.kArmAmpPos);
+    MoveArmToPose armToZero = new MoveArmToPose(arm, Constants.ArmProfile.kArmInitialPos);
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -68,22 +80,17 @@ public class RobotContainer {
             )
         );
 
-    // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    // joystick.b().whileTrue(drivetrain.applyRequest(
-    //     () -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-    //     )
-    // );
 
     // reset the field-centric heading on left bumper press
     joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
-    // if (Utils.isSimulation()) {
-    //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-    // }
+    joystick.y().onTrue(armToSpeaker);
+    joystick.y().whileTrue(setShooterSpeedForSpeaker.alongWith(new SetIndexerSpeed(indexer, Constants.ArmProfile.kIndexerDefaultOutput)));
+    joystick.y().onFalse(armToZero);
 
-    joystick.y().whileTrue(setShooterSpeedforSepaker);
-    joystick.x().whileTrue(setShooterSpeedforAmp);
-    joystick.b().whileTrue(stowAndShootNote);
+    joystick.x().onTrue(armToAmp);
+    joystick.x().whileTrue(setShooterSpeedForAmp.alongWith(new SetIndexerSpeed(indexer, Constants.ArmProfile.kIndexerDefaultOutput)));
+    joystick.x().onFalse(armToZero);
 
     drivetrain.registerTelemetry(logger::telemeterize);
     

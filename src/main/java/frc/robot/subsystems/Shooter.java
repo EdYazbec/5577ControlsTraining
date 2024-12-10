@@ -10,8 +10,8 @@ import frc.robot.Constants.ArmProfile;
 
 public class Shooter extends SubsystemBase {
     /** Shooter Motors */
-    private WPI_TalonSRX shooterA = new WPI_TalonSRX(ArmProfile.shooterID_A);
-    private WPI_TalonSRX shooterB = new WPI_TalonSRX(ArmProfile.shooterID_B);
+    private WPI_TalonSRX shooterA = new WPI_TalonSRX(ArmProfile.shooterID_A); //18
+    private WPI_TalonSRX shooterB = new WPI_TalonSRX(ArmProfile.shooterID_B); //19
 
     /** Initaliaztion Box */
     public Shooter() {

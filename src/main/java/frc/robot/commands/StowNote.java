@@ -35,7 +35,7 @@ public class StowNote extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        // turn off the indexer when this command is interrupted
+        // turn off the indexer when this command ends or is interrupted
         indexerSubsystem.setMotorOutput(0);
     }
 
