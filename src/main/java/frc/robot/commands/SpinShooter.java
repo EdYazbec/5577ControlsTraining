@@ -28,14 +28,14 @@ public class SpinShooter extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooterSubsystem.setShooterOutput(outputValue);
+        shooterSubsystem.setSpeed(outputValue);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         // when this commmand ends, we should turn off the motors
-        shooterSubsystem.setShooterOutput(0);
+        shooterSubsystem.setSpeed(0);
     }
 
     // Returns true when the command should end.

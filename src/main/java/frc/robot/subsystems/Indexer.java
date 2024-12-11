@@ -16,10 +16,10 @@ public class Indexer extends SubsystemBase {
     // in here, we are declaring what things exist on the indexer. 
     // in our case, it has a motor, and  a time of flight (distance) sensor
 
-    /** Indexor Motor */
+    /** Indexer Motor */
     private WPI_TalonSRX motor = new WPI_TalonSRX(ArmProfile.indexerID);
 
-    /** Indexor Sensors */
+    /** Indexer Sensors */
     private TimeOfFlight sensor = new TimeOfFlight(49);
         
     /** Creates a new Indexer. */
@@ -34,7 +34,7 @@ public class Indexer extends SubsystemBase {
      * 
      * @param outputValue commanded output value, -1 to 1
      */
-    public void setMotorOutput(double outputValue) {
+    public void setOutput(double outputValue) {
         motor.set(outputValue);
     } 
 

@@ -13,7 +13,7 @@ public class Shooter extends SubsystemBase {
     private WPI_TalonSRX shooterA = new WPI_TalonSRX(ArmProfile.shooterID_A); //18
     private WPI_TalonSRX shooterB = new WPI_TalonSRX(ArmProfile.shooterID_B); //19
 
-    /** Initaliaztion Box */
+    /** Initialization Box */
     public Shooter() {
         /** Factory Resets */
         shooterA.configFactoryDefault();
@@ -33,7 +33,7 @@ public class Shooter extends SubsystemBase {
      * 
      * @param outputValue commanded output value, -1 to 1
      */
-    public void setShooterOutput(double outputValue) {
+    public void setSpeed(double outputValue) {
         shooterA.set(outputValue);
         shooterB.set(outputValue);
     } 
